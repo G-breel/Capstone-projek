@@ -1,10 +1,7 @@
-const express = require("express")
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
+const transaksiController = require("../controllers/transaksiController");
 
-router.get("/", (req, res) => {
-  res.json({
-    message: "Wishlist API working"
-  })
-})
+router.post("/tambah", transaksiController.tambahTransaksi);
 
-module.exports = router
+module.exports = router;
