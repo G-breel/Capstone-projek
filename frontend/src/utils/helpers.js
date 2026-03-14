@@ -1,0 +1,73 @@
+/**
+ * Format Rupiah
+ */
+export function formatRupiah(amount) {
+  const abs = Math.abs(amount)
+  const formatted = new Intl.NumberFormat('id-ID').format(abs)
+  const prefix = amount < 0 ? '-Rp ' : 'Rp '
+  return prefix + formatted
+}
+
+export function formatRupiahCompact(amount) {
+  const abs = Math.abs(amount)
+  if (abs >= 1_000_000_000) return (amount < 0 ? '-' : '') + 'Rp ' + (abs / 1_000_000_000).toFixed(1) + 'M'
+  if (abs >= 1_000_000) return (amount < 0 ? '-' : '') + 'Rp ' + (abs / 1_000_000).toFixed(1) + 'jt'
+  if (abs >= 1_000) return (amount < 0 ? '-' : '') + 'Rp ' + (abs / 1_000).toFixed(0) + 'K'
+  return formatRupiah(amount)
+}
+
+/**
+ * Format date DD/MM/YY
+ */
+export function formatDate(dateStr) {
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: '2-digit' })
+}
+
+/**
+ * Format tanggal Indonesia
+ */
+export function formatDateFull(dateStr) {
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+export function getGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 11) return 'Selamat Pagi'
+  if (hour < 15) return 'Selamat Siang'
+  if (hour < 18) return 'Selamat Sore'
+  return 'Selamat Malam'
+}
+
+/**
+ * Nama Bulan
+ */
+export function getMonthName(monthIndex) {
+  const months = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ]
+  return months[monthIndex]
+}
+
+/**
+ * Generate bulan untuk dropdown
+ */
+export function getMonthOptions(year) {
+  const months = []
+  for (let i = 0; i < 12; i++) {
+    months.push({
+      value: `${year}-${String(i + 1).padStart(2, '0')}`,
+      label: `${getMonthName(i)} ${year}`,
+    })
+  }
+  return months
+}
+
+/**
+ * Hari ini YYYY-MM-DD
+ */
+export function getTodayISO() {
+  return new Date().toISOString().split('T')[0]
+}
