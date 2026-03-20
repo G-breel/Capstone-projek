@@ -10,11 +10,11 @@ export function AuthProvider({ children }) {
     return saved && token ? JSON.parse(saved) : null
   })
 
-  const login = useCallback(async (email, password) => {
+  const login = useCallback(async (email, password, captchaToken) => {
     try {
       console.log('Login attempt:', { email })
       
-      const response = await api.post('/auth/login', { email, password })
+      const response = await api.post('/auth/login', { email, password, captchaToken })
       console.log('Login response:', response.data)
       
       const { user, token } = response.data.data
@@ -68,11 +68,11 @@ export function AuthProvider({ children }) {
   }, [])
 
   // FUNGSI REGISTER
-  const register = useCallback(async (name, email, password) => {
+  const register = useCallback(async (name, email, password, captchaToken) => {
     try {
       console.log('Register attempt:', { name, email })
       
-      const response = await api.post('/auth/register', { name, email, password })
+      const response = await api.post('/auth/register', { name, email, password, captchaToken })
       console.log('Register response:', response.data)
       
       const { user, token } = response.data.data
@@ -93,6 +93,26 @@ export function AuthProvider({ children }) {
       return { 
         success: false, 
         message: error.response?.data?.message || 'Registrasi gagal. Silakan coba lagi.' 
+      }
+    }
+  }, [])
+
+  // FUNGSI GOOGLE LOGIN
+  const googleLogin = useCallback(async (credentialResponse) => {
+    try {
+      const response = await api.post('/auth/google', { credential: credentialResponse.credential })
+      const { user, token } = response.data.data
+
+      localStorage.setItem('tabunganqu_user', JSON.stringify(user))
+      localStorage.setItem('tabunganqu_token', token)
+      setUser(user)
+
+      return { success: true }
+    } catch (error) {
+      console.error('Google login error:', error.response?.data || error.message)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Login dengan Google gagal. Silakan coba lagi.'
       }
     }
   }, [])
@@ -145,6 +165,7 @@ export function AuthProvider({ children }) {
     user,
     login,
     register,
+    googleLogin,
     logout,
     updateProfile,
     deleteAccount

@@ -1,5 +1,16 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
+const axios = require('axios');
+
+const verifyRecaptcha = async (token) => {
+  const response = await axios.post(
+    `https://www.google.com/recaptcha/api/siteverify`,
+    null,
+    { params: { secret: process.env.RECAPTCHA_SECRET_KEY, response: token } }
+  )
+  return response.data.success
+}
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -9,7 +20,16 @@ const generateToken = (id) => {
 
 const register = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, captchaToken } = req.body;
+
+    // Verifikasi reCAPTCHA
+    if (!captchaToken) {
+      return res.status(400).json({ success: false, message: 'Verifikasi reCAPTCHA diperlukan' });
+    }
+    const captchaValid = await verifyRecaptcha(captchaToken)
+    if (!captchaValid) {
+      return res.status(400).json({ success: false, message: 'Verifikasi reCAPTCHA gagal' });
+    }
 
     // Check if user exists
     const existingUser = await User.findByEmail(email);
@@ -38,8 +58,17 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    
+    const { email, password, captchaToken } = req.body;
+
+    // Verifikasi reCAPTCHA
+    if (!captchaToken) {
+      return res.status(400).json({ success: false, message: 'Verifikasi reCAPTCHA diperlukan' });
+    }
+    const captchaValid = await verifyRecaptcha(captchaToken)
+    if (!captchaValid) {
+      return res.status(400).json({ success: false, message: 'Verifikasi reCAPTCHA gagal' });
+    }
+
     console.log('Login attempt for email:', email);
 
     // Validasi input
@@ -168,9 +197,71 @@ const deleteAccount = async (req, res, next) => {
   }
 };
 
+const googleAuth = async (req, res, next) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: 'Credential Google diperlukan'
+      });
+    }
+
+    // Verifikasi token Google
+    let payload;
+    try {
+      const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID
+      });
+      payload = ticket.getPayload();
+    } catch (err) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token Google tidak valid'
+      });
+    }
+
+    const { sub: googleId, email, name, picture } = payload;
+
+    // Cari user by google_id dulu, lalu by email
+    let user = await User.findByGoogleId(googleId);
+
+    if (!user) {
+      // Cek apakah email sudah terdaftar (akun biasa)
+      const existingUser = await User.findByEmail(email);
+      if (existingUser) {
+        // Link google_id ke akun yang sudah ada
+        await require('../config/database').pool.execute(
+          'UPDATE users SET google_id = ?, avatar = COALESCE(avatar, ?) WHERE id = ?',
+          [googleId, picture || null, existingUser.id]
+        );
+        user = await User.findById(existingUser.id);
+      } else {
+        // Buat akun baru via Google
+        user = await User.createGoogleUser({ googleId, name, email, avatar: picture });
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Login dengan Google berhasil',
+      data: {
+        user,
+        token: generateToken(user.id)
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
+  googleAuth,
   getProfile,
   updateProfile,
   changePassword,

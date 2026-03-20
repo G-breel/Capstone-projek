@@ -5,6 +5,7 @@ const { validate, authValidations } = require('../middleware/validationMiddlewar
 const {
   register,
   login,
+  googleAuth,
   getProfile,
   updateProfile,
   changePassword,
@@ -14,6 +15,7 @@ const {
 // Public routes
 router.post('/register', validate(authValidations.register), register);
 router.post('/login', validate(authValidations.login), login);
+router.post('/google', googleAuth);
 
 // Protected routes
 router.use(protect);
