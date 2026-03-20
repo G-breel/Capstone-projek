@@ -8,6 +8,11 @@ export function ToastProvider({ children }) {
   const addToast = useCallback((message, type = 'success', duration = 3000) => {
     const id = Date.now() + Math.random()
     setToasts(prev => [...prev, { id, message, type, duration }])
+<<<<<<< HEAD
+=======
+    
+    // Auto remove after duration
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id))
     }, duration)
@@ -23,12 +28,18 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast, success, error }}>
       {children}
+<<<<<<< HEAD
       {/* Toast container */}
+=======
+      
+      {/* Toast Container - Pastini ini ada */}
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
       <div className="fixed top-5 right-5 z-[9999] flex flex-col gap-2">
         {toasts.map(toast => (
           <div
             key={toast.id}
             onClick={() => removeToast(toast.id)}
+<<<<<<< HEAD
             className={`flex items-center gap-2 py-3 px-5 rounded-md text-white font-medium text-[14px] cursor-pointer shadow-lg min-w-[280px] max-w-[400px] animate-[toastSlideIn_300ms_ease_forwards] bg-gradient-to-br ${
               toast.type === 'success'
                 ? 'from-emerald-500 to-emerald-600'
@@ -36,6 +47,17 @@ export function ToastProvider({ children }) {
             }`}
           >
             <span>{toast.type === 'success' ? '✅' : '❌'}</span>
+=======
+            className={`flex items-center gap-2 py-3 px-5 rounded-md text-white font-medium text-[14px] cursor-pointer shadow-lg min-w-[280px] max-w-[400px] animate-[toastSlideIn_300ms_ease_forwards] ${
+              toast.type === 'success'
+                ? 'bg-gradient-to-br from-emerald-500 to-emerald-600'
+                : 'bg-gradient-to-br from-red-500 to-red-600'
+            }`}
+          >
+            <span className="text-lg">
+              {toast.type === 'success' ? '✅' : '❌'}
+            </span>
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
             <span>{toast.message}</span>
           </div>
         ))}
@@ -46,6 +68,12 @@ export function ToastProvider({ children }) {
 
 export function useToast() {
   const context = useContext(ToastContext)
+<<<<<<< HEAD
   if (!context) throw new Error('useToast must be used within ToastProvider')
+=======
+  if (!context) {
+    throw new Error('useToast must be used within ToastProvider')
+  }
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
   return context
 }

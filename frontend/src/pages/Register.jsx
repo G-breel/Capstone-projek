@@ -7,13 +7,22 @@ export default function Register() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+<<<<<<< HEAD
   const [captchaChecked, setCaptchaChecked] = useState(false) // State buat Captcha
+=======
+  const [captchaChecked, setCaptchaChecked] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
   
   const { register } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
 
+<<<<<<< HEAD
   function handleSubmit(e) {
+=======
+  async function handleSubmit(e) {
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
     e.preventDefault()
     
     if (!name || !email || !password) {
@@ -26,18 +35,39 @@ export default function Register() {
       return
     }
 
+<<<<<<< HEAD
     // Validasi Captcha
+=======
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
     if (!captchaChecked) {
       toast.error('Tolong centang "I\'m not a robot" terlebih dahulu')
       return
     }
 
+<<<<<<< HEAD
     const result = register(name, email, password)
     if (result.success) {
       toast.success('Akun berhasil dibuat! 🎉')
       navigate('/dashboard', { replace: true })
     } else {
       toast.error(result.message)
+=======
+    setIsLoading(true)
+    
+    try {
+      const result = await register(name, email, password)
+      
+      if (result.success) {
+        toast.success('Akun berhasil dibuat! 🎉')
+        navigate('/dashboard', { replace: true })
+      } else {
+        toast.error(result.message)
+      }
+    } catch (error) {
+      toast.error('Terjadi kesalahan. Silakan coba lagi.')
+    } finally {
+      setIsLoading(false)
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
     }
   }
 
@@ -61,12 +91,34 @@ export default function Register() {
       {/* Container */}
       <div className="relative z-10 w-full max-w-[90%] min-[577px]:max-w-[420px] bg-[#525050]/60 rounded-2xl py-[30px] px-6 min-[577px]:py-10 min-[577px]:px-10 shadow-[0_10px_40px_rgba(0,0,0,0.5)] backdrop-blur-[10px] border border-white/10 animate-scale-in">
         
+<<<<<<< HEAD
         <h1 
           className="font-bold text-[40px] min-[577px]:text-[48px] text-white text-center m-0 mb-2.5 leading-none cursor-pointer font-['Inter',_sans-serif]" 
+=======
+        {/* TAMBAHKAN TOMBOL CLOSE / BACK */}
+        <button 
+          onClick={() => navigate('/')}
+          className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+          title="Kembali ke Beranda"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        {/* Logo yang bisa diklik */}
+        <h1 
+          className="font-bold text-[40px] min-[577px]:text-[48px] text-white text-center m-0 mb-2.5 leading-none cursor-pointer hover:text-emerald-400 transition-colors font-['Inter',_sans-serif]" 
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
           onClick={() => navigate('/')}
         >
           TabunganQu
         </h1>
+<<<<<<< HEAD
+=======
+
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
         <p className="text-white text-[13px] text-left mb-[30px] opacity-90">
           Mulai perjalanan menuju finansial teratur.
         </p>
@@ -125,9 +177,16 @@ export default function Register() {
 
           <button 
             type="submit" 
+<<<<<<< HEAD
             className="mt-4 bg-[#28a745] text-white border-none p-3 text-[16px] font-medium rounded cursor-pointer transition-colors duration-200 hover:bg-[#218838] font-['Inter',_sans-serif]"
           >
             Daftar
+=======
+            disabled={isLoading}
+            className="mt-4 bg-[#28a745] text-white border-none p-3 text-[16px] font-medium rounded cursor-pointer transition-colors duration-200 hover:bg-[#218838] disabled:opacity-50 disabled:cursor-not-allowed font-['Inter',_sans-serif]"
+          >
+            {isLoading ? 'Loading...' : 'Daftar'}
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
           </button>
         </form>
 
@@ -145,9 +204,26 @@ export default function Register() {
           Google
         </button>
 
+<<<<<<< HEAD
         <p className="text-center text-white text-[14px] mt-8 font-['Inter',_sans-serif]">
           Sudah punya akun? <Link to="/login" className="text-[#00b2ff] no-underline hover:underline">Login</Link>
         </p>
+=======
+        {/* Link ke Login dan Home */}
+        <div className="flex justify-between items-center mt-8 text-white text-[14px] font-['Inter',_sans-serif]">
+          <Link to="/login" className="text-[#00b2ff] no-underline hover:underline">
+            Sudah punya akun? Login
+          </Link>
+          
+          <Link to="/" className="text-white/60 hover:text-white transition-colors flex items-center gap-1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span>Beranda</span>
+          </Link>
+        </div>
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
       </div>
     </div>
   )

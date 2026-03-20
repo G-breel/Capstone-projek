@@ -6,12 +6,18 @@ import { useToast } from '../context/ToastContext'
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+<<<<<<< HEAD
   const [captchaChecked, setCaptchaChecked] = useState(false) // State buat Captcha
+=======
+  const [captchaChecked, setCaptchaChecked] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
   
   const { login } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
 
+<<<<<<< HEAD
   function handleSubmit(e) {
     e.preventDefault()
     
@@ -21,17 +27,64 @@ export default function Login() {
     }
     
     // Validasi Captcha
+=======
+  async function handleSubmit(e) {
+    e.preventDefault()
+    
+    // Validasi input
+    if (!email || !password) {
+      toast.error('Email dan password harus diisi')
+      return
+    }
+    
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
     if (!captchaChecked) {
       toast.error('Tolong centang "I\'m not a robot" terlebih dahulu')
       return
     }
 
+<<<<<<< HEAD
     const result = login(email, password)
     if (result.success) {
       toast.success('Login berhasil! Selamat datang 👋')
       navigate('/dashboard', { replace: true })
     } else {
       toast.error(result.message)
+=======
+    // Validasi format email sederhana
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      toast.error('Format email tidak valid')
+      return
+    }
+
+    setIsLoading(true)
+    
+    try {
+      console.log('Mencoba login dengan email:', email)
+      
+      const result = await login(email, password)
+      console.log('Hasil login:', result)
+      
+      if (result.success) {
+        toast.success('Login berhasil! Selamat datang 👋')
+        // Beri sedikit delay agar toast terlihat
+        setTimeout(() => {
+          navigate('/dashboard', { replace: true })
+        }, 1000)
+      } else {
+        // Tampilkan pesan error dari server
+        toast.error(result.message)
+        
+        // Reset captcha jika diperlukan
+        setCaptchaChecked(false)
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error)
+      toast.error('Terjadi kesalahan yang tidak terduga')
+    } finally {
+      setIsLoading(false)
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
     }
   }
 
@@ -55,12 +108,34 @@ export default function Login() {
       {/* Container */}
       <div className="relative z-10 w-full max-w-[90%] min-[577px]:max-w-[420px] bg-[#525050]/60 rounded-2xl py-10 px-[30px] min-[577px]:px-10 shadow-[0_10px_40px_rgba(0,0,0,0.5)] backdrop-blur-[10px] border border-white/10 animate-scale-in">
         
+<<<<<<< HEAD
         <h1 
           className="font-bold text-[40px] min-[577px]:text-[48px] text-white text-center m-0 mb-2.5 leading-none cursor-pointer font-['Inter',_sans-serif]" 
+=======
+        {/* TAMBAHKAN TOMBOL CLOSE / BACK */}
+        <button 
+          onClick={() => navigate('/')}
+          className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+          title="Kembali ke Beranda"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        {/* Logo yang bisa diklik */}
+        <h1 
+          className="font-bold text-[40px] min-[577px]:text-[48px] text-white text-center m-0 mb-2.5 leading-none cursor-pointer hover:text-emerald-400 transition-colors font-['Inter',_sans-serif]" 
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
           onClick={() => navigate('/')}
         >
           TabunganQu
         </h1>
+<<<<<<< HEAD
+=======
+
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
         <p className="text-white text-[13px] text-left mb-[30px] opacity-90">
           Selamat datang menuju finasial teratur.
         </p>
@@ -69,7 +144,11 @@ export default function Login() {
           <div className="relative w-full">
             <input
               type="text"
+<<<<<<< HEAD
               placeholder="User/Email"
+=======
+              placeholder="Email"
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
               value={email}
               onChange={e => setEmail(e.target.value)}
               className="w-full bg-transparent border-none text-white text-[16px] py-2 outline-none placeholder:text-white/50"
@@ -108,9 +187,16 @@ export default function Login() {
 
           <button 
             type="submit" 
+<<<<<<< HEAD
             className="mt-5 bg-[#28a745] text-white border-none p-3 text-[16px] font-medium rounded cursor-pointer transition-colors duration-200 hover:bg-[#218838] font-['Inter',_sans-serif]"
           >
             Login
+=======
+            disabled={isLoading}
+            className="mt-5 bg-[#28a745] text-white border-none p-3 text-[16px] font-medium rounded cursor-pointer transition-colors duration-200 hover:bg-[#218838] disabled:opacity-50 disabled:cursor-not-allowed font-['Inter',_sans-serif]"
+          >
+            {isLoading ? 'Loading...' : 'Login'}
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
           </button>
         </form>
 
@@ -128,9 +214,26 @@ export default function Login() {
           Google
         </button>
 
+<<<<<<< HEAD
         <p className="text-center text-white text-[14px] mt-10 font-['Inter',_sans-serif]">
           Belum punya akun? <Link to="/register" className="text-[#00b2ff] no-underline hover:underline">Register</Link>
         </p>
+=======
+        {/* Link ke Register dan Home */}
+        <div className="flex justify-between items-center mt-10 text-white text-[14px] font-['Inter',_sans-serif]">
+          <Link to="/register" className="text-[#00b2ff] no-underline hover:underline">
+            Belum punya akun? Register
+          </Link>
+          
+          <Link to="/" className="text-white/60 hover:text-white transition-colors flex items-center gap-1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span>Beranda</span>
+          </Link>
+        </div>
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
       </div>
     </div>
   )

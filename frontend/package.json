@@ -17,6 +17,10 @@
     "vite": "^7.3.1"
   },
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "axios": "^1.13.6",
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.1",

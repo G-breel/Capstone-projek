@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
+<<<<<<< HEAD
 import Footer from '../components/layout/Footer'
 
 const Icon = ({ name, size = 16, className = '' }) => {
@@ -15,6 +16,19 @@ const Icon = ({ name, size = 16, className = '' }) => {
 
 export default function Settings() {
   const { user, updateProfile, deleteAccount, logout } = useAuth()
+=======
+import api from '../services/api'
+import Footer from '../components/layout/Footer'
+import LoadingSpinner from '../components/ui/LoadingSpinner'
+
+// Icons component (same as before)
+const Icon = ({ name, size = 16, className = '' }) => {
+  // ... (same Icon component code)
+}
+
+export default function Settings() {
+  const { user, updateProfile: authUpdateProfile, deleteAccount: authDeleteAccount, logout } = useAuth()
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
   const toast = useToast()
 
   const [name, setName] = useState(user?.name || '')
@@ -22,6 +36,7 @@ export default function Settings() {
   const [oldPw, setOldPw] = useState('')
   const [newPw, setNewPw] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+<<<<<<< HEAD
 
   function handleDeleteAccount() {
     deleteAccount()
@@ -42,6 +57,80 @@ export default function Settings() {
     toast.success('Password berhasil diubah 🔐')
     setOldPw('')
     setNewPw('')
+=======
+  const [loading, setLoading] = useState({
+    profile: false,
+    password: false,
+    delete: false
+  })
+
+  const handleDeleteAccount = async () => {
+    setLoading(prev => ({ ...prev, delete: true }))
+    
+    try {
+      const result = await authDeleteAccount()
+      if (result.success) {
+        toast.success('Akun Anda telah dihapus secara permanen 🗑️')
+      } else {
+        toast.error(result.message)
+      }
+    } catch (error) {
+      toast.error('Gagal menghapus akun')
+    } finally {
+      setLoading(prev => ({ ...prev, delete: false }))
+      setShowDeleteConfirm(false)
+    }
+  }
+
+  const handleProfileSave = async (e) => {
+    e.preventDefault()
+    
+    if (!name.trim()) { 
+      toast.error('Nama tidak boleh kosong'); 
+      return 
+    }
+
+    setLoading(prev => ({ ...prev, profile: true }))
+    
+    try {
+      const result = await authUpdateProfile({ name: name.trim() })
+      if (result.success) {
+        toast.success('Profil berhasil diperbarui ✅')
+      } else {
+        toast.error(result.message)
+      }
+    } catch (error) {
+      toast.error('Gagal update profil')
+    } finally {
+      setLoading(prev => ({ ...prev, profile: false }))
+    }
+  }
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault()
+    
+    if (!oldPw || !newPw) { 
+      toast.error('Semua field password harus diisi'); 
+      return 
+    }
+    if (newPw.length < 6) { 
+      toast.error('Password baru minimal 6 karakter'); 
+      return 
+    }
+
+    setLoading(prev => ({ ...prev, password: true }))
+    
+    try {
+      await api.put('/auth/password', { oldPassword: oldPw, newPassword: newPw })
+      toast.success('Password berhasil diubah 🔐')
+      setOldPw('')
+      setNewPw('')
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal mengubah password')
+    } finally {
+      setLoading(prev => ({ ...prev, password: false }))
+    }
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
   }
 
   return (
@@ -86,8 +175,19 @@ export default function Settings() {
               </div>
             </div>
             <div className="flex justify-end mt-2">
+<<<<<<< HEAD
               <button type="submit" className="bg-[#5bc55f] text-white border-none rounded-[20px] py-2 px-8 font-['Inter',_sans-serif] text-[14px] cursor-pointer transition-opacity duration-200 hover:opacity-90">
                 Simpan
+=======
+              <button 
+                type="submit" 
+                disabled={loading.profile}
+                className={`bg-[#5bc55f] text-white border-none rounded-[20px] py-2 px-8 font-['Inter',_sans-serif] text-[14px] cursor-pointer transition-opacity duration-200 hover:opacity-90 ${
+                  loading.profile ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {loading.profile ? 'Menyimpan...' : 'Simpan'}
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
               </button>
             </div>
           </form>
@@ -122,8 +222,19 @@ export default function Settings() {
               />
             </div>
             <div className="flex justify-end mt-2">
+<<<<<<< HEAD
               <button type="submit" className="bg-white/10 border border-white/20 text-white rounded-[20px] py-2 px-6 font-['Inter',_sans-serif] text-[14px] cursor-pointer transition-colors duration-200 hover:bg-white/20">
                 Ubah Password
+=======
+              <button 
+                type="submit" 
+                disabled={loading.password}
+                className={`bg-white/10 border border-white/20 text-white rounded-[20px] py-2 px-6 font-['Inter',_sans-serif] text-[14px] cursor-pointer transition-colors duration-200 hover:bg-white/20 ${
+                  loading.password ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {loading.password ? 'Mengubah...' : 'Ubah Password'}
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
               </button>
             </div>
           </form>
@@ -142,30 +253,57 @@ export default function Settings() {
             <button 
               className="bg-transparent border border-[#ff6b6b] text-[#ff6b6b] rounded-lg py-3 px-6 font-['Inter',_sans-serif] text-[14px] font-medium cursor-pointer transition-colors duration-200 hover:bg-[#ff6b6b] hover:text-white flex items-center gap-2"
               onClick={() => setShowDeleteConfirm(true)}
+<<<<<<< HEAD
+=======
+              disabled={loading.delete}
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
             >
               <Icon name="trash" size={16} /> Hapus Akun Saya
             </button>
           ) : (
             <div className="bg-black/30 border border-red-500/30 rounded-xl p-5 animate-scale-in">
+<<<<<<< HEAD
               <p className="text-white font-medium text-[15px] mb-4 m-0">Apakah Anda yakin ingin menghapus akun permanen?</p>
+=======
+              <p className="text-white font-medium text-[15px] mb-4 m-0">
+                Apakah Anda yakin ingin menghapus akun permanen?
+              </p>
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
               <div className="flex gap-3">
                 <button 
                   className="bg-white/10 border-none text-white rounded-lg py-2.5 px-5 font-['Inter',_sans-serif] text-[13px] cursor-pointer transition-colors hover:bg-white/20"
                   onClick={() => setShowDeleteConfirm(false)}
+<<<<<<< HEAD
+=======
+                  disabled={loading.delete}
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
                 >
                   Batal
                 </button>
                 <button 
+<<<<<<< HEAD
                   className="bg-[#ff4747] border-none text-white rounded-lg py-2.5 px-5 font-['Inter',_sans-serif] text-[13px] font-medium cursor-pointer transition-colors hover:bg-[#ff2424]"
                   onClick={handleDeleteAccount}
                 >
                   Ya, Hapus Permanen!
+=======
+                  className={`bg-[#ff4747] border-none text-white rounded-lg py-2.5 px-5 font-['Inter',_sans-serif] text-[13px] font-medium cursor-pointer transition-colors hover:bg-[#ff2424] ${
+                    loading.delete ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                  onClick={handleDeleteAccount}
+                  disabled={loading.delete}
+                >
+                  {loading.delete ? 'Menghapus...' : 'Ya, Hapus Permanen!'}
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
                 </button>
               </div>
             </div>
           )}
         </div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
       </div>
 
       <Footer />

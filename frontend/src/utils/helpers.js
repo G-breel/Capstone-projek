@@ -2,24 +2,63 @@
  * Format Rupiah
  */
 export function formatRupiah(amount) {
+<<<<<<< HEAD
+=======
+  if (amount === undefined || amount === null) return '0'
+  
+  const abs = Math.abs(amount)
+  const formatted = new Intl.NumberFormat('id-ID').format(abs)
+  return formatted
+}
+
+export function formatRupiahWithSymbol(amount) {
+  if (amount === undefined || amount === null) return 'Rp 0'
+  
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
   const abs = Math.abs(amount)
   const formatted = new Intl.NumberFormat('id-ID').format(abs)
   const prefix = amount < 0 ? '-Rp ' : 'Rp '
   return prefix + formatted
 }
 
+<<<<<<< HEAD
 export function formatRupiahCompact(amount) {
   const abs = Math.abs(amount)
   if (abs >= 1_000_000_000) return (amount < 0 ? '-' : '') + 'Rp ' + (abs / 1_000_000_000).toFixed(1) + 'M'
   if (abs >= 1_000_000) return (amount < 0 ? '-' : '') + 'Rp ' + (abs / 1_000_000).toFixed(1) + 'jt'
   if (abs >= 1_000) return (amount < 0 ? '-' : '') + 'Rp ' + (abs / 1_000).toFixed(0) + 'K'
   return formatRupiah(amount)
+=======
+// PERBAIKAN: Tambahkan variable formatted
+export function formatRupiahCompact(amount) {
+  if (amount === undefined || amount === null) return 'Rp 0'
+  
+  const abs = Math.abs(amount)
+  let formatted
+  
+  if (abs >= 1_000_000_000) {
+    formatted = (abs / 1_000_000_000).toFixed(1) + 'M'
+  } else if (abs >= 1_000_000) {
+    formatted = (abs / 1_000_000).toFixed(1) + 'jt'
+  } else if (abs >= 1_000) {
+    formatted = (abs / 1_000).toFixed(0) + 'K'
+  } else {
+    formatted = new Intl.NumberFormat('id-ID').format(abs)
+  }
+  
+  const prefix = amount < 0 ? '-Rp ' : 'Rp '
+  return prefix + formatted
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
 }
 
 /**
  * Format date DD/MM/YY
  */
 export function formatDate(dateStr) {
+<<<<<<< HEAD
+=======
+  if (!dateStr) return '-'
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
   const d = new Date(dateStr)
   return d.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: '2-digit' })
 }
@@ -28,6 +67,10 @@ export function formatDate(dateStr) {
  * Format tanggal Indonesia
  */
 export function formatDateFull(dateStr) {
+<<<<<<< HEAD
+=======
+  if (!dateStr) return '-'
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
   const d = new Date(dateStr)
   return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
 }
@@ -70,4 +113,8 @@ export function getMonthOptions(year) {
  */
 export function getTodayISO() {
   return new Date().toISOString().split('T')[0]
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> f767e41 (Update fitur auto-update wishlist dan perbaikan UI)
