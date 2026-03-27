@@ -1,21 +1,19 @@
--- Create database
 CREATE DATABASE IF NOT EXISTS tabunganqu_db;
 USE tabunganqu_db;
 
--- Users table
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NULL,
     avatar VARCHAR(255) NULL,
+    google_avatar VARCHAR(255) NULL,
     google_id VARCHAR(255) NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email)
 );
 
--- Transactions table
 CREATE TABLE IF NOT EXISTS transactions (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -30,7 +28,6 @@ CREATE TABLE IF NOT EXISTS transactions (
     INDEX idx_type (type)
 );
 
--- Wishlist table
 CREATE TABLE IF NOT EXISTS wishlists (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -43,7 +40,7 @@ CREATE TABLE IF NOT EXISTS wishlists (
     INDEX idx_user_id (user_id)
 );
 
--- Create views for easier reporting
+-- Pre-calculated summary to optimize dashboard load times
 CREATE VIEW IF NOT EXISTS user_summary AS
 SELECT 
     u.id as user_id,

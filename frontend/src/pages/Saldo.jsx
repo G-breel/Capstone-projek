@@ -10,20 +10,17 @@ import LoadingSpinner from '../components/ui/LoadingSpinner'
 export default function Saldo() {
   const toast = useToast()
   
-  // States
   const [loading, setLoading] = useState(true)
   const [pemasukan, setPemasukan] = useState([])
   const [pengeluaran, setPengeluaran] = useState([])
   const [summary, setSummary] = useState({ saldo: 0, pemasukan: 0, pengeluaran: 0 })
   const [wishlists, setWishlists] = useState([])
   
-  // Filter states
   const now = new Date()
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   const [pemasukanMonth, setPemasukanMonth] = useState(currentMonth)
   const [pengeluaranMonth, setPengeluaranMonth] = useState(currentMonth)
   
-  // Modal states
   const [modalOpen, setModalOpen] = useState(false)
   const [modalType, setModalType] = useState('pemasukan')
   const [editItem, setEditItem] = useState(null)
@@ -31,10 +28,9 @@ export default function Saldo() {
     date: getTodayISO(),
     amount: '',
     description: '',
-    wishlistId: '' // <-- TAMBAHKAN INI
+    wishlistId: ''
   })
 
-  // Fetch data
   useEffect(() => {
     fetchAllData()
   }, [])
@@ -86,7 +82,7 @@ export default function Saldo() {
       date: getTodayISO(),
       amount: '',
       description: '',
-      wishlistId: '' // Reset wishlist
+      wishlistId: ''
     })
     setModalOpen(true)
   }
@@ -98,12 +94,11 @@ export default function Saldo() {
       date: item.transaction_date,
       amount: item.amount,
       description: item.description,
-      wishlistId: '' // Edit tidak update wishlist
+      wishlistId: ''
     })
     setModalOpen(true)
   }
 
-  // FUNGSI UPDATE WISHLIST MANUAL
   const updateWishlistManually = async (wishlistId, type, amount) => {
     if (!wishlistId) return null
     
@@ -150,7 +145,6 @@ export default function Saldo() {
       return
     }
 
-    // Validasi saldo untuk pengeluaran baru
     if (modalType === 'pengeluaran' && !editItem && amount > summary.saldo) {
       toast.error('Saldo tidak cukup!')
       return
@@ -166,15 +160,12 @@ export default function Saldo() {
       }
 
       if (editItem) {
-        // UPDATE: Edit transaksi
         await transactionService.updateTransaction(editItem.id, data)
         toast.success(`${modalType} berhasil diupdate`)
       } else {
-        // CREATE: Tambah transaksi baru
         const transactionRes = await transactionService.createTransaction(data)
         toast.success(`${modalType} berhasil ditambahkan`)
         
-        // *** UPDATE WISHLIST MANUAL jika dipilih ***
         if (formData.wishlistId) {
           try {
             const result = await updateWishlistManually(
@@ -196,8 +187,8 @@ export default function Saldo() {
       }
 
       setModalOpen(false)
-      await fetchAllData() // Refresh data
-      await fetchWishlists() // Refresh wishlists
+      await fetchAllData()
+      await fetchWishlists()
       
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal menyimpan')
@@ -230,7 +221,6 @@ export default function Saldo() {
     }
   }
 
-  // Generate opsi bulan
   const monthOptions = () => {
     const options = []
     for (let i = 0; i < 6; i++) {
@@ -248,7 +238,6 @@ export default function Saldo() {
     return options
   }
 
-  // Render tabel transaksi
   const renderTable = (data, type, selectedMonth, setMonth) => (
     <div className="bg-[#555555] rounded-[18px] p-6 shadow-lg mt-6">
       <div className="flex justify-between items-center mb-4">
@@ -326,7 +315,6 @@ export default function Saldo() {
 
   return (
     <div className="text-white p-6">
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-emerald-600 rounded-xl p-6">
           <p className="text-sm opacity-90">Total Saldo</p>
@@ -342,11 +330,9 @@ export default function Saldo() {
         </div>
       </div>
 
-      {/* Tables */}
       {renderTable(pemasukan, 'pemasukan', pemasukanMonth, setPemasukanMonth)}
       {renderTable(pengeluaran, 'pengeluaran', pengeluaranMonth, setPengeluaranMonth)}
 
-      {/* Modal Form */}
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -380,7 +366,6 @@ export default function Saldo() {
             />
           </div>
           
-          {/* TAMBAHKAN DROPDOWN WISHLIST */}
           {!editItem && wishlists.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">

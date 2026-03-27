@@ -15,7 +15,6 @@ export default function Wishlist() {
   const [summary, setSummary] = useState({ saldo: 0 });
   const [search, setSearch] = useState("");
 
-  // Modal states
   const [modalOpen, setModalOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [formData, setFormData] = useState({
@@ -152,7 +151,6 @@ export default function Wishlist() {
 
   return (
     <div className="text-white p-6">
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Wishlist Saya</h2>
         <button
@@ -163,13 +161,11 @@ export default function Wishlist() {
         </button>
       </div>
 
-      {/* Saldo Info */}
       <div className="bg-emerald-600 rounded-xl p-4 mb-6">
         <p className="text-sm opacity-90">Saldo Tersedia</p>
         <p className="text-2xl font-bold">Rp {formatRupiah(summary.saldo)}</p>
       </div>
 
-      {/* Search */}
       <div className="mb-6">
         <input
           type="text"
@@ -180,7 +176,6 @@ export default function Wishlist() {
         />
       </div>
 
-      {/* Wishlist Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {wishlists.length === 0 ? (
           <div className="col-span-full text-center py-12 text-gray-400">
@@ -199,7 +194,6 @@ export default function Wishlist() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Target:</span>
-                    {/* PERBAIKAN: Hapus 'Rp' manual, pake fungsi formatRupiah aja */}
                     <span className="font-mono">
                       Rp {formatRupiah(item.target_amount)}
                     </span>
@@ -218,7 +212,6 @@ export default function Wishlist() {
                   </div>
                 </div>
 
-                {/* Progress Bar */}
                 <div className="mt-3">
                   <div className="flex justify-between text-xs mb-1">
                     <span>Progress</span>
@@ -242,7 +235,6 @@ export default function Wishlist() {
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div className="flex justify-end gap-2 mt-4">
                   <button
                     onClick={() => openEditModal(item)}
@@ -263,7 +255,6 @@ export default function Wishlist() {
         )}
       </div>
 
-      {/* Modal */}
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

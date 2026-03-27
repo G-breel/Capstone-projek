@@ -32,7 +32,6 @@ export default function Report() {
   const [chartData, setChartData] = useState([])
   const [yearlyData, setYearlyData] = useState(null)
 
-  // Generate month options for last 12 months
   const monthOptions = () => {
     const options = []
     const currentDate = new Date()
@@ -49,7 +48,6 @@ export default function Report() {
     return options
   }
 
-  // Fetch monthly report data
   useEffect(() => {
     fetchMonthlyReport()
   }, [selectedMonth])
@@ -57,23 +55,19 @@ export default function Report() {
   const fetchMonthlyReport = async () => {
     setLoading(true)
     try {
-      // Get summary for selected month
       const summaryRes = await transactionService.getSummary(selectedMonth)
       setSummary(summaryRes.data)
 
-      // Get all transactions for selected month
       const transactionsRes = await transactionService.getTransactions({
         startDate: `${selectedMonth}-01`,
         endDate: `${selectedMonth}-${new Date(selectedMonth.split('-')[0], selectedMonth.split('-')[1], 0).getDate()}`
       })
       
-      // Sort transactions by date (newest first)
       const sortedTransactions = transactionsRes.data.sort((a, b) => 
         new Date(b.transaction_date) - new Date(a.transaction_date)
       )
       setTransactions(sortedTransactions)
 
-      // Prepare daily chart data
       const dailyMap = new Map()
       sortedTransactions.forEach(trans => {
         const day = new Date(trans.transaction_date).getDate()
@@ -98,7 +92,6 @@ export default function Report() {
       
       setChartData(dailyChartData)
 
-      // Get yearly data for comparison (same year)
       const year = selectedMonth.split('-')[0]
       const yearlyTransactions = await transactionService.getTransactions({
         startDate: `${year}-01-01`,
@@ -139,7 +132,6 @@ export default function Report() {
     }
   }
 
-  // Pie chart data for expense categories
   const getCategoryData = () => {
     const categories = new Map()
     transactions.forEach(trans => {
@@ -155,125 +147,114 @@ export default function Report() {
       .slice(0, 5)
   }
 
- // EXPORT TO PDF
-const exportToPDF = () => {
-  try {
-    const doc = new jsPDF('p', 'mm', 'a4')
-    const selectedDate = new Date(selectedMonth.split('-')[0], parseInt(selectedMonth.split('-')[1]) - 1)
-    const monthName = getMonthName(selectedDate.getMonth())
-    const year = selectedDate.getFullYear()
-    
-    // Title
-    doc.setFontSize(20)
-    doc.setTextColor(0, 0, 0)
-    doc.text(`Laporan Keuangan ${monthName} ${year}`, 14, 20)
-    
-    // User info
-    doc.setFontSize(11)
-    doc.setTextColor(100, 100, 100)
-    doc.text(`Nama: ${user?.name || 'Pengguna'}`, 14, 30)
-    doc.text(`Email: ${user?.email || '-'}`, 14, 36)
-    doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 42)
-    
-    // Summary table
-    const summaryData = [
-      ['Total Pemasukan', `Rp ${formatRupiah(summary.pemasukan)}`],
-      ['Total Pengeluaran', `Rp ${formatRupiah(summary.pengeluaran)}`],
-      ['Saldo Akhir', `Rp ${formatRupiah(summary.saldo)}`],
-      ['Jumlah Transaksi Pemasukan', summary.total_transactions_pemasukan.toString()],
-      ['Jumlah Transaksi Pengeluaran', summary.total_transactions_pengeluaran.toString()],
-    ]
-    
-    autoTable(doc, {
-      startY: 48,
-      head: [['Deskripsi', 'Nilai']],
-      body: summaryData,
-      theme: 'grid',
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [59, 130, 246], textColor: 255, fontSize: 11 },
-      alternateRowStyles: { fillColor: [240, 240, 240] }
-    })
-    
-    // Fix: Get finalY correctly without TypeScript syntax
-    let finalY = doc.lastAutoTable?.finalY || 58
-    finalY = finalY + 10
-    
-    // Transactions table
-    if (transactions.length > 0) {
-      const transactionData = transactions.map(t => [
-        formatDateFull(t.transaction_date),
-        t.description,
-        t.type === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran',
-        `Rp ${formatRupiah(t.amount)}`
-      ])
+  const exportToPDF = () => {
+    try {
+      const doc = new jsPDF('p', 'mm', 'a4')
+      const selectedDate = new Date(selectedMonth.split('-')[0], parseInt(selectedMonth.split('-')[1]) - 1)
+      const monthName = getMonthName(selectedDate.getMonth())
+      const year = selectedDate.getFullYear()
+      
+      doc.setFontSize(20)
+      doc.setTextColor(0, 0, 0)
+      doc.text(`Laporan Keuangan ${monthName} ${year}`, 14, 20)
+      
+      doc.setFontSize(11)
+      doc.setTextColor(100, 100, 100)
+      doc.text(`Nama: ${user?.name || 'Pengguna'}`, 14, 30)
+      doc.text(`Email: ${user?.email || '-'}`, 14, 36)
+      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 42)
+      
+      const summaryData = [
+        ['Total Pemasukan', `Rp ${formatRupiah(summary.pemasukan)}`],
+        ['Total Pengeluaran', `Rp ${formatRupiah(summary.pengeluaran)}`],
+        ['Saldo Akhir', `Rp ${formatRupiah(summary.saldo)}`],
+        ['Jumlah Transaksi Pemasukan', summary.total_transactions_pemasukan.toString()],
+        ['Jumlah Transaksi Pengeluaran', summary.total_transactions_pengeluaran.toString()],
+      ]
       
       autoTable(doc, {
-        startY: finalY,
-        head: [['Tanggal', 'Keterangan', 'Tipe', 'Nominal']],
-        body: transactionData,
+        startY: 48,
+        head: [['Deskripsi', 'Nilai']],
+        body: summaryData,
         theme: 'grid',
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [34, 197, 94], textColor: 255, fontSize: 10 },
-        alternateRowStyles: { fillColor: [250, 250, 250] }
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [59, 130, 246], textColor: 255, fontSize: 11 },
+        alternateRowStyles: { fillColor: [240, 240, 240] }
       })
       
-      finalY = doc.lastAutoTable?.finalY || finalY
+      let finalY = doc.lastAutoTable?.finalY || 58
       finalY = finalY + 10
-    }
-    
-    // Category summary
-    const categoryData = getCategoryData()
-    if (categoryData.length > 0) {
-      const categoryTableData = categoryData.map(c => [
-        c.name,
-        `Rp ${formatRupiah(c.value)}`,
-        `${((c.value / summary.pengeluaran) * 100).toFixed(1)}%`
-      ])
       
-      autoTable(doc, {
-        startY: finalY,
-        head: [['Kategori', 'Total', 'Persentase']],
-        body: categoryTableData,
-        theme: 'grid',
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [239, 68, 68], textColor: 255, fontSize: 10 },
-        alternateRowStyles: { fillColor: [250, 250, 250] }
-      })
+      if (transactions.length > 0) {
+        const transactionData = transactions.map(t => [
+          formatDateFull(t.transaction_date),
+          t.description,
+          t.type === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran',
+          `Rp ${formatRupiah(t.amount)}`
+        ])
+        
+        autoTable(doc, {
+          startY: finalY,
+          head: [['Tanggal', 'Keterangan', 'Tipe', 'Nominal']],
+          body: transactionData,
+          theme: 'grid',
+          styles: { fontSize: 9 },
+          headStyles: { fillColor: [34, 197, 94], textColor: 255, fontSize: 10 },
+          alternateRowStyles: { fillColor: [250, 250, 250] }
+        })
+        
+        finalY = doc.lastAutoTable?.finalY || finalY
+        finalY = finalY + 10
+      }
+      
+      const categoryData = getCategoryData()
+      if (categoryData.length > 0) {
+        const categoryTableData = categoryData.map(c => [
+          c.name,
+          `Rp ${formatRupiah(c.value)}`,
+          `${((c.value / summary.pengeluaran) * 100).toFixed(1)}%`
+        ])
+        
+        autoTable(doc, {
+          startY: finalY,
+          head: [['Kategori', 'Total', 'Persentase']],
+          body: categoryTableData,
+          theme: 'grid',
+          styles: { fontSize: 9 },
+          headStyles: { fillColor: [239, 68, 68], textColor: 255, fontSize: 10 },
+          alternateRowStyles: { fillColor: [250, 250, 250] }
+        })
+      }
+      
+      const pageCount = doc.getNumberOfPages()
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i)
+        doc.setFontSize(8)
+        doc.setTextColor(150, 150, 150)
+        doc.text(
+          `TabunganQu - Laporan Bulanan | Halaman ${i} dari ${pageCount}`,
+          doc.internal.pageSize.width / 2,
+          doc.internal.pageSize.height - 10,
+          { align: 'center' }
+        )
+      }
+      
+      doc.save(`Laporan_${monthName}_${year}.pdf`)
+      toast.success('PDF berhasil diexport! 📄')
+    } catch (error) {
+      console.error('Error exporting PDF:', error)
+      toast.error('Gagal export PDF')
     }
-    
-    // Footer
-    const pageCount = doc.getNumberOfPages()
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i)
-      doc.setFontSize(8)
-      doc.setTextColor(150, 150, 150)
-      doc.text(
-        `TabunganQu - Laporan Bulanan | Halaman ${i} dari ${pageCount}`,
-        doc.internal.pageSize.width / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
-      )
-    }
-    
-    doc.save(`Laporan_${monthName}_${year}.pdf`)
-    toast.success('PDF berhasil diexport! 📄')
-  } catch (error) {
-    console.error('Error exporting PDF:', error)
-    toast.error('Gagal export PDF')
   }
-}
 
-  // EXPORT TO EXCEL
   const exportToExcel = () => {
     try {
       const selectedDate = new Date(selectedMonth.split('-')[0], parseInt(selectedMonth.split('-')[1]) - 1)
       const monthName = getMonthName(selectedDate.getMonth())
       const year = selectedDate.getFullYear()
       
-      // Create workbook
       const wb = XLSX.utils.book_new()
       
-      // Sheet 1: Summary
       const summarySheetData = [
         ['Laporan Keuangan', `${monthName} ${year}`],
         [''],
@@ -297,7 +278,6 @@ const exportToPDF = () => {
       const summarySheet = XLSX.utils.aoa_to_sheet(summarySheetData)
       XLSX.utils.book_append_sheet(wb, summarySheet, 'Ringkasan')
       
-      // Sheet 2: Transactions
       if (transactions.length > 0) {
         const transactionSheetData = [
           ['Detail Transaksi', `${monthName} ${year}`],
@@ -316,12 +296,10 @@ const exportToPDF = () => {
         })
         
         const transactionSheet = XLSX.utils.aoa_to_sheet(transactionSheetData)
-        // Set column widths
         transactionSheet['!cols'] = [{ wch: 15 }, { wch: 30 }, { wch: 12 }, { wch: 15 }, { wch: 15 }]
         XLSX.utils.book_append_sheet(wb, transactionSheet, 'Transaksi')
       }
       
-      // Sheet 3: Category Analysis
       const categoryData = getCategoryData()
       if (categoryData.length > 0) {
         const categorySheetData = [
@@ -347,7 +325,6 @@ const exportToPDF = () => {
         XLSX.utils.book_append_sheet(wb, categorySheet, 'Analisis Kategori')
       }
       
-      // Sheet 4: Daily Summary
       if (chartData.length > 0) {
         const dailySheetData = [
           ['Ringkasan Harian', `${monthName} ${year}`],
@@ -371,7 +348,6 @@ const exportToPDF = () => {
         XLSX.utils.book_append_sheet(wb, dailySheet, 'Ringkasan Harian')
       }
       
-      // Export file
       const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
       const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
       saveAs(data, `Laporan_${monthName}_${year}.xlsx`)
@@ -392,7 +368,7 @@ const exportToPDF = () => {
           <p className="font-semibold mb-1">Tanggal: {label}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color }}>
-              {entry.name === 'pemasukan' ? '💰 Pemasukan' : '📉 Pengeluaran'}: Rp {formatRupiah(entry.value)}
+              {entry.name === 'Pemasukan' ? '💰 Pemasukan' : '📉 Pengeluaran'}: Rp {formatRupiah(entry.value)}
             </p>
           ))}
         </div>
@@ -416,7 +392,6 @@ const exportToPDF = () => {
 
   return (
     <div className="text-white pb-10 animate-fade-in font-['Inter',_sans-serif]">
-      {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
@@ -429,7 +404,6 @@ const exportToPDF = () => {
           </div>
           
           <div className="flex gap-3">
-            {/* Export Buttons */}
             <button
               onClick={exportToPDF}
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
@@ -460,8 +434,6 @@ const exportToPDF = () => {
           </div>
         </div>
 
-        {/* Rest of the component remains the same... */}
-        {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-xl p-5">
             <p className="text-sm opacity-90">Saldo Akhir</p>
@@ -488,20 +460,19 @@ const exportToPDF = () => {
           </div>
         </div>
 
-        {/* Daily Chart */}
         <div className="bg-[#555555] bg-[linear-gradient(260deg,rgba(0,0,0,0.2)_60%,rgba(153,153,153,0.2)_100%)] rounded-[18px] p-6 mb-6 border border-white/5">
           <h3 className="text-[18px] font-medium text-white mb-4">
             Grafik Harian - {monthName} {year}
           </h3>
           <div className="w-full h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+              <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
                 <XAxis 
                   dataKey="day" 
                   axisLine={true} 
                   tickLine={false} 
                   tick={{ fill: 'white', fontSize: 12 }} 
-                  label={{ value: 'Tanggal', position: 'insideBottom', offset: -5, fill: 'white' }}
+                  label={{ value: 'Tanggal', position: 'insideBottom', offset: -15, fill: 'white' }}
                 />
                 <YAxis 
                   axisLine={true} 
@@ -518,7 +489,6 @@ const exportToPDF = () => {
           </div>
         </div>
 
-        {/* Yearly Comparison Chart */}
         {yearlyData && (
           <div className="bg-[#555555] bg-[linear-gradient(260deg,rgba(0,0,0,0.2)_60%,rgba(153,153,153,0.2)_100%)] rounded-[18px] p-6 mb-6 border border-white/5">
             <h3 className="text-[18px] font-medium text-white mb-4">
@@ -563,10 +533,7 @@ const exportToPDF = () => {
           </div>
         )}
 
-        {/* Two Column Layout for Categories and Transactions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          {/* Expense Categories Pie Chart */}
           <div className="bg-[#555555] bg-[linear-gradient(260deg,rgba(0,0,0,0.2)_60%,rgba(153,153,153,0.2)_100%)] rounded-[18px] p-6 border border-white/5">
             <h3 className="text-[18px] font-medium text-white mb-4">
               Kategori Pengeluaran
@@ -584,8 +551,6 @@ const exportToPDF = () => {
                         data={categoryData}
                         cx="50%"
                         cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
@@ -613,7 +578,6 @@ const exportToPDF = () => {
             )}
           </div>
 
-          {/* Transaction List */}
           <div className="bg-[#555555] bg-[linear-gradient(260deg,rgba(0,0,0,0.2)_60%,rgba(153,153,153,0.2)_100%)] rounded-[18px] p-6 border border-white/5">
             <h3 className="text-[18px] font-medium text-white mb-4">
               Detail Transaksi
