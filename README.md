@@ -98,10 +98,6 @@ GROUP BY u.id, u.name, u.email;
    npm install
    ```
 
-5. **Konfigurasi Environment**:
-   - Copy `.env.example` ke `.env` di folder `backend`
-   - Isi konfigurasi database dan JWT
-   - Hubungi tim jika ada kendala
 
 ## Struktur Proyek
 ```
