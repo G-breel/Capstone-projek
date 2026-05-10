@@ -1,0 +1,53 @@
+const mysql = require('mysql2/promise');
+require('dotenv').config();
+
+async function init() {
+  const db = await mysql.createConnection(process.env.DATABASE_URL);
+
+  console.log("⏳ Connected ke database...");
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      name VARCHAR(100) NOT NULL,
+      email VARCHAR(100) UNIQUE NOT NULL,
+      password VARCHAR(255),
+      avatar VARCHAR(255),
+      google_id VARCHAR(255) UNIQUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+  `);
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS transactions (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      user_id INT NOT NULL,
+      type ENUM('pemasukan', 'pengeluaran') NOT NULL,
+      amount INT NOT NULL,
+      description TEXT NOT NULL,
+      transaction_date DATE NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS wishlists (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      user_id INT NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      target_amount INT NOT NULL,
+      saved_amount INT DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  console.log("✅ Semua tabel berhasil dibuat!");
+  await db.end();
+}
+
+init();
