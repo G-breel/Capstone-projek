@@ -202,7 +202,7 @@ export default function Login() {
               size="large"
               text="continue_with"
               shape="pill"
-              width="100%"
+              width="280"
             />
           </div>
         </div>
