@@ -56,6 +56,8 @@ Proyek ini adalah aplikasi pengelola keuangan pribadi berbasis web untuk membant
    GOOGLE_CLIENT_ID=your_google_client_id
    RECAPTCHA_SECRET_KEY=your_recaptcha_secret
    ```
+   > [!IMPORTANT]
+   > Anda wajib mengisi `GOOGLE_CLIENT_ID` dan `RECAPTCHA_SECRET_KEY` dengan kunci asli agar fitur login & keamanan berjalan.
 
    **Jalankan backend:**
    ```bash
@@ -74,6 +76,8 @@ Proyek ini adalah aplikasi pengelola keuangan pribadi berbasis web untuk membant
    VITE_GOOGLE_CLIENT_ID=your_google_client_id
    VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
    ```
+   > [!IMPORTANT]
+   > Pastikan `VITE_RECAPTCHA_SITE_KEY` sesuai dengan `RECAPTCHA_SECRET_KEY` di backend agar verifikasi captcha berhasil.
 
    **Jalankan frontend:**
    ```bash
